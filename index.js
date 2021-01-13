@@ -27,11 +27,11 @@ app.post('/newPais',db.createPais)
 app.put('/updatePais/:id', db.updatePais)
 app.delete('/deletePais/:id',db.elimPais)
 //Crud Importes
-app.get('/Import', db.getPaises)
-app.get('/Import/:id', db.getPaisId)
-app.post('/newImport',db.createPais)
-app.put('/updateImport/:id', db.updatePais)
-app.delete('/deleteImport/:id',db.elimPais)
+app.get('/Import', db.getImport)
+app.get('/Import/:id', db.getImportId)
+app.post('/newImport',db.createImportado)
+app.put('/updateImport/:id', db.updateImportado)
+app.delete('/deleteImport/:id',db.elimImportado)
 
 
 

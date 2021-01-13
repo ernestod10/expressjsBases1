@@ -91,8 +91,8 @@ const getPaisId = (request, response) => {
 //CREATE 1 producto
 const createPais = (request, response) => {
   const { nombre } = request.body
-
-  pool.query('INSERT INTO pais (nombre_pais) VALUES ($1)', [nombre], (error, results) => {
+  
+  pool.query('insert into Pais (nombre_pais) values ($1)', [nombre], (error, results) => {
     if (error) {
       throw error
     }

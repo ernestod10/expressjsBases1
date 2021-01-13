@@ -36,7 +36,7 @@ const pool = new Pool({
           if (error) {
             throw error
           }
-          response.status(201).send(`Producto añadido con ID: ${result.insertId}`)
+          response.status(201).send(`Producto añadido `)
         })
       }
     //UPDATE cambia 1 producto por ID
@@ -96,7 +96,7 @@ const createPais = (request, response) => {
     if (error) {
       throw error
     }
-    response.status(201).send(`Pais añadido con ID: ${result.insertId}`)
+    response.status(201).send(`Pais añadido`)
   })
 }
 //UPDATE cambia 1 Pais por ID
@@ -156,7 +156,7 @@ const createImportado = (request, response) => {
     if (error) {
       throw error
     }
-    response.status(201).send(`importado añadido con ID: ${result.insertId}`)
+    response.status(201).send(`importado añadido`)
   })
 }
 //UPDATE cambia 1 Pais por ID

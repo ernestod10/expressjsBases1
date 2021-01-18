@@ -10,199 +10,199 @@ const pool = new Pool({
 /* _____________________________________________________________________________________________________________*/
     //GET todos los productos
     const getProductos = (request, response) => {
-        pool.query('SELECT * FROM Producto ORDER BY id_producto ASC', (error, results) => {
-        if (error) {
-            throw error
-        }
-        response.status(200).json(results.rows)
-        })
-    }
-    //GET 1 producto por ID
-    const geProductoId = (request, response) => {
-        const id = parseInt(request.params.id)
-      
-        pool.query('SELECT * FROM Producto WHERE id_producto = $1', [id], (error, results) => {
-          if (error) {
-            throw error
-          }
-          response.status(200).json(results.rows)
-        })
+      pool.query('SELECT * FROM Producto ORDER BY id_producto ASC', (error, results) => {
+      if (error) {
+          throw error
       }
-    //CREATE 1 producto
-    const createProducto = (request, response) => {
-        const { nombre, Precio_unitario } = request.body
-      
-        pool.query('INSERT INTO producto (nombre_producto, Precio_unitario) VALUES ($1, $2)', [nombre, Precio_unitario], (error, results) => {
-          if (error) {
-            throw error
-          }
-          response.status(201).send(`Producto añadido `)
-        })
-      }
-    //UPDATE cambia 1 producto por ID
-    const updateProducto = (request, response) => {
-      const id = parseInt(request.params.id)
-      const { nombre, Precio_unitario } = request.body
-    
-      pool.query(
-        'UPDATE producto SET nombre = $1, Precio_unitario = $2 WHERE id = $3',
-        [nombre, Precio_unitario, id],
-        (error, results) => {
-          if (error) {
-            throw error
-          }
-          response.status(200).send(`Producto modificado ID: ${id}`)
-        }
-      )
-    }
-    //ELIMINA 1 producto con ID
-    const elimProducto = (request, response) => {
+      response.status(200).json(results.rows)
+      })
+  }
+  //GET 1 producto por ID
+  const getProductoId = (request, response) => {
       const id = parseInt(request.params.id)
     
-      pool.query(' DELETE FROM producto WHERE id_producto = $1', [id], (error, results) => {
+      pool.query('SELECT * FROM Producto WHERE id_producto = $1', [id], (error, results) => {
         if (error) {
           throw error
         }
-        response.status(200).send(`Producto eliminado ID: ${id}`)
+        response.status(200).json(results.rows)
       })
     }
+  //CREATE 1 producto
+  const createProducto = (request, response) => {
+      const { nombre_producto, precio_unitario } = request.body
+    
+      pool.query('INSERT INTO producto (nombre_producto, Precio_unitario) VALUES ($1, $2)', [nombre_producto, precio_unitario], (error, results) => {
+        if (error) {
+          throw error
+        }
+        response.status(201).send(results.rows);
+      })
+    }
+  //UPDATE cambia 1 producto por ID
+  const updateProducto = (request, response) => {
+    const id_producto = parseInt(request.params.id);
+    const { nombre_producto, precio_unitario } = request.body
+  
+    pool.query(
+      'UPDATE producto SET nombre_producto = $1, Precio_unitario = $2 WHERE id_producto = $3',
+      [nombre_producto, precio_unitario, id_producto],
+      (error, results) => {
+        if (error) {
+          throw error
+        }
+        response.status(200).send(results.rows)
+      }
+    )
+  }
+  //ELIMINA 1 producto con ID
+  const elimProducto = (request, response) => {
+    const id = parseInt(request.params.id)
+  
+    pool.query(' DELETE FROM producto WHERE id_producto = $1', [id], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send(results.rows)
+    })
+  }
 //PAISES
 /* _____________________________________________________________________________________________________________*/
 //GET todos los Paises
 const getPaises = (request, response) => {
-  pool.query('SELECT * FROM pais ORDER BY id_pais ASC', (error, results) => {
-  if (error) {
-      throw error
-  }
-  response.status(200).json(results.rows)
-  })
+pool.query('SELECT * FROM pais ORDER BY id_pais ASC', (error, results) => {
+if (error) {
+    throw error
+}
+response.status(200).json(results.rows)
+})
 }
 //GET 1 Pais por ID
 const getPaisId = (request, response) => {
-  const id = parseInt(request.params.id)
+const id_pais = parseInt(request.params.id)
 
-  pool.query('SELECT * FROM pais WHERE id_pais = $1', [id], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
+pool.query('SELECT * FROM pais WHERE id_pais = $1', [id_pais], (error, results) => {
+  if (error) {
+    throw error
+  }
+  response.status(200).json(results.rows)
+})
 }
 //CREATE 1 producto
 const createPais = (request, response) => {
-  const { nombre } = request.body
-  
-  pool.query('insert into Pais (nombre_pais) values ($1)', [nombre], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(201).send(`Pais añadido`)
-  })
+const { nombre_pais } = request.body
+
+pool.query('insert into pais (nombre_pais) values ($1)', [nombre_pais], (error, results) => {
+  if (error) {
+    throw error
+  }
+  response.status(201).send(results.rows)
+})
 }
 //UPDATE cambia 1 Pais por ID
 const updatePais = (request, response) => {
-  const id = parseInt(request.params.id)
-  const { nombre } = request.body
+const id_pais = parseInt(request.params.id)
+const { nombre_pais } = request.body
 
-  pool.query(
-    'UPDATE pais SET nombre = $1 WHERE id = $2',
-    [nombre, id],
-    (error, results) => {
-      if (error) {
-        throw error
-      }
-      response.status(200).send(`Pais modificado ID: ${id}`)
-    }
-  )
-}
-//ELIMINA 1 Pais con ID
-const elimPais = (request, response) => {
-const id = parseInt(request.params.id)
-
-  pool.query(' DELETE FROM pais WHERE id_pais = $1', [id], (error, results) => {
+pool.query(
+  'UPDATE pais SET nombre_pais = $1 WHERE id_pais = $2',
+  [nombre_pais, id_pais],
+  (error, results) => {
     if (error) {
       throw error
     }
-    response.status(200).send(`Producto eliminado ID: ${id}`)
-  })
+    response.status(200).send(results.rows)
+  }
+)
+}
+//ELIMINA 1 Pais con ID
+const elimPais = (request, response) => {
+const id_pais = parseInt(request.params.id)
+
+pool.query(' DELETE FROM pais WHERE id_pais = $1', [id_pais], (error, results) => {
+  if (error) {
+    throw error
+  }
+  response.status(200).send(results.rows)
+})
 }
 //IMPORTACIONES
 /* _____________________________________________________________________________________________________________*/
 //GET todas las importaciones
 const getImport = (request, response) => {
-  pool.query('SELECT * FROM importado ORDER BY id_importacion ASC', (error, results) => {
+pool.query('SELECT * FROM importado ORDER BY id_importacion ASC', (error, results) => {
+if (error) {
+    throw error
+}
+response.status(200).json(results.rows)
+})
+}
+//GET 1 importado por ID
+const getImportId = (request, response) => {
+const id_importado = parseInt(request.params.id)
+
+pool.query('SELECT * FROM importado WHERE id_importacion = $1', [id_importado], (error, results) => {
   if (error) {
-      throw error
+    throw error
   }
   response.status(200).json(results.rows)
-  })
+})
 }
-//GET 1 Pais por ID
-const getImportId = (request, response) => {
-  const id = parseInt(request.params.id)
-
-  pool.query('SELECT * FROM importado WHERE id_importacion = $1', [id], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
-}
-//CREATE 1 producto
+//CREATE 1 importado
 const createImportado = (request, response) => {
-  const { cant,fecha,id_pais,id_producto } = request.body
+const { cantidad,fecha,pais_id_pais,producto_id_producto } = request.body
 
-  pool.query('insert into Importado (cantidad, fecha, pais_id_pais, producto_id_producto) values ($1,$2,$3,$4)', [cant,fecha,id_pais,id_producto], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(201).send(`importado añadido`)
-  })
+pool.query('insert into Importado (cantidad, fecha, pais_id_pais, producto_id_producto) values ($1,$2,$3,$4)', [cantidad,fecha,pais_id_pais,producto_id_producto], (error, results) => {
+  if (error) {
+    throw error
+  }
+  response.status(201).send(results.rows)
+})
 }
 //UPDATE cambia 1 Pais por ID
 const updateImportado = (request, response) => {
-  const id = parseInt(request.params.id)
-  const { cantidad } = request.body
+const id = parseInt(request.params.id)
+const { cantidad } = request.body
 
-  pool.query(
-    'UPDATE importado SET cantidad = $1 WHERE id = $2',
-    [cantidad, id],
-    (error, results) => {
-      if (error) {
-        throw error
-      }
-      response.status(200).send(`importado modificado ID: ${id}`)
+pool.query(
+  'UPDATE importado SET cantidad = $1 WHERE id = $2',
+  [cantidad, id],
+  (error, results) => {
+    if (error) {
+      throw error
     }
-  )
+    response.status(200).send(`importado modificado ID: ${id}`)
+  }
+)
 }
 //ELIMINA 1 importado con ID
 const elimImportado = (request, response) => {
 const id = parseInt(request.params.id)
 
-  pool.query(' DELETE FROM importado WHERE id_importacion = $1', [id], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).send(`Importe eliminado ID: ${id}`)
-  })
+pool.query(' DELETE FROM importado WHERE id_importacion = $1', [id], (error, results) => {
+  if (error) {
+    throw error
+  }
+  response.status(200).send(results.rows)
+})
 }
 module.exports={
-    getProductos,
-    geProductoId,
-    createProducto,
-    updateProducto,
-    elimProducto,
+  getProductos,
+  getProductoId,
+  createProducto,
+  updateProducto,
+  elimProducto,
 
-    getPaises,
-    getPaisId,
-    createPais,
-    updatePais,
-    elimPais,
+  getPaises,
+  getPaisId,
+  createPais,
+  updatePais,
+  elimPais,
 
-    getImport,
-    getImportId,
-    createImportado,
-    updateImportado,
-    elimImportado,
+  getImport,
+  getImportId,
+  createImportado,
+  updateImportado,
+  elimImportado,
 
 }

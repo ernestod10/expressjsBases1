@@ -2,15 +2,15 @@ const Pool = require('pg').Pool
 const pool = new Pool({
   user: 'postgres', //Aqui pongan su user
   host: 'localhost',
-  database: 'Demo_Ambiente', //el nombre de su BD
+  database: 'Bases1', //el nombre de su BD
   password: '0809',           //y la contraseña
   port: 5432,
 })
-//PRODUCTOS
+//SOCIOS
 /* _____________________________________________________________________________________________________________*/
-    //GET todos los productos
-    const getProductos = (request, response) => {
-      pool.query('SELECT * FROM Producto ORDER BY id_producto ASC', (error, results) => {
+    //GET todas las agencias
+    const getAgencias = (request, response) => {
+      pool.query('SELECT * FROM agencia ORDER BY id_agencia ASC', (error, results) => {
       if (error) {
           throw error
       }
@@ -18,35 +18,35 @@ const pool = new Pool({
       })
   }
   //GET 1 producto por ID
-  const getProductoId = (request, response) => {
+  const getAgenciaId = (request, response) => {
       const id = parseInt(request.params.id)
     
-      pool.query('SELECT * FROM Producto WHERE id_producto = $1', [id], (error, results) => {
+      pool.query('SELECT * FROM agencia WHERE id_agencia = $1', [id], (error, results) => {
         if (error) {
           throw error
         }
         response.status(200).json(results.rows)
       })
     }
-  //CREATE 1 producto
-  const createProducto = (request, response) => {
-      const { nombre_producto, precio_unitario } = request.body
+  //CREATE 1 Agencia (Si no hay agencia asociada se pone como null)
+  const createAgencia = (request, response) => {
+      const { nombre_agencia, tipo_operacion, alcance, descripcion, pagina, agencia_asociada} = request.body
     
-      pool.query('INSERT INTO producto (nombre_producto, Precio_unitario) VALUES ($1, $2)', [nombre_producto, precio_unitario], (error, results) => {
+      pool.query('INSERT INTO agencia (nombre_agencia, tipo_de_operacion,alcance,descripcion,pagina_web,agencia_id_agencia) VALUES ($1, $2,$3,$4,$5,$6)', [nombre_agencia, tipo_operacion, alcance, descripcion, pagina, agencia_asociada], (error, results) => {
         if (error) {
           throw error
         }
         response.status(201).send(results.rows);
       })
     }
-  //UPDATE cambia 1 producto por ID
-  const updateProducto = (request, response) => {
-    const id_producto = parseInt(request.params.id);
-    const { nombre_producto, precio_unitario } = request.body
+  //UPDATE cambia 1 agencia por ID
+  const updateAgencia = (request, response) => {
+    const id_agencia = parseInt(request.params.id);
+    const { nombre_agencia, tipo_operacion, alcance, descripcion, pagina, agencia_asociada } = request.body
   
     pool.query(
-      'UPDATE producto SET nombre_producto = $1, Precio_unitario = $2 WHERE id_producto = $3',
-      [nombre_producto, precio_unitario, id_producto],
+      'UPDATE producto SET nombre_agencia = $1, tipo_de_operacion = $2,alcance = $3,descripcion =$4 ,pagina_web=$5,agencia_id_agencia =$6 WHERE id_producto = $7',
+      [nombre_agencia, tipo_operacion, alcance, descripcion, pagina, agencia_asociada, id_agencia],
       (error, results) => {
         if (error) {
           throw error
@@ -55,18 +55,18 @@ const pool = new Pool({
       }
     )
   }
-  //ELIMINA 1 producto con ID
-  const elimProducto = (request, response) => {
+  //ELIMINA 1 agencia con ID
+  const elimAgencia = (request, response) => {
     const id = parseInt(request.params.id)
   
-    pool.query(' DELETE FROM producto WHERE id_producto = $1', [id], (error, results) => {
+    pool.query(' DELETE FROM agencia WHERE id_agencia = $1', [id], (error, results) => {
       if (error) {
         throw error
       }
       response.status(200).send(results.rows)
     })
   }
-//PAISES
+//REGISTRO CLIENTES
 /* _____________________________________________________________________________________________________________*/
 //GET todos los Paises
 const getPaises = (request, response) => {
@@ -126,7 +126,7 @@ pool.query(' DELETE FROM pais WHERE id_pais = $1', [id_pais], (error, results) =
   response.status(200).send(results.rows)
 })
 }
-//IMPORTACIONES
+//EXPEDIENTE VIAJEROS
 /* _____________________________________________________________________________________________________________*/
 //GET todas las importaciones
 const getImport = (request, response) => {
@@ -187,18 +187,19 @@ pool.query(' DELETE FROM importado WHERE id_importacion = $1', [id], (error, res
 })
 }
 module.exports={
-  getProductos,
-  getProductoId,
-  createProducto,
-  updateProducto,
-  elimProducto,
-
+  //SOCIOS
+  getAgencias,
+  getAgenciaId,
+  createAgencia,
+  updateAgencia,
+  elimAgencia,
+  //CLIENTES
   getPaises,
   getPaisId,
   createPais,
   updatePais,
   elimPais,
-
+  //VIAJEROS
   getImport,
   getImportId,
   createImportado,

@@ -24,24 +24,40 @@ app.get('/', (request, response) => {
     response.json({ info: 'Node.js, Express, and Postgres API' })
   })
 
-//Crud Productos
-app.get('/Productos', db.getProductos)
-app.get('/Productos/:id', db.getProductoId)
-app.post('/newProducto',db.createProducto)
-app.put('/updateProducto/:id', db.updateProducto)
-app.delete('/deleteProducto/:id',db.elimProducto)
-//Crud Paises
-app.get('/Paises', db.getPaises)
-app.get('/Paises/:id', db.getPaisId)
-app.post('/newPais',db.createPais)
-app.put('/updatePais/:id', db.updatePais)
-app.delete('/deletePais/:id',db.elimPais)
-//Crud Importes
-app.get('/Import', db.getImport)
-app.get('/Import/:id', db.getImportId)
-app.post('/newImport',db.createImportado)
-app.put('/updateImport/:id', db.updateImportado)
-app.delete('/deleteImport/:id',db.elimImportado)
+//Crud Agencias
+app.get('/agencias', db.getAgencias)
+app.get('/agenciasSocias/:id',db.getAgenciasSocias)
+app.get('/agencias/:id', db.getAgenciaId)
+app.post('/asociarAgencia/:id',db.asociarseAgencia)
+app.delete('/desasociarAgencia/:id',db.desasociarseAgencia)
+app.post('/newAgencia',db.createAgencia)
+app.put('/updateAgencia/:id', db.updateAgencia)
+app.delete('/deleteAgencia/:id',db.elimAgencia)
+//Crud Proveedores
+app.get('/proveedores', db.getProveedores)
+app.get('/proveedoresSocias/:id',db.getProveedorId)
+app.get('/proveedor/:id', db.getProveedoresAsociados)
+app.post('/asociarProveedor/:id',db.asociarseProveedor)
+app.delete('/desasociarProveedor/:id',db.desasociarseProveedor)
+app.post('/newProveedor',db.createProveedor)
+app.put('/updateProveedor/:id', db.updateProveedor)
+app.delete('/deleteProveedor/:id',db.elimProveedor)
+//Crud Clientes
+app.get('/clientes', db.getClientes)
+app.get('/cliente/:id',db.getClienteId)
+app.post('/registroCliente/:id',db.registrarCliente)
+app.delete('/eliminarRegistroC/:id',db.elimRegCliente)
+app.post('/newCliente',db.createCliente)
+app.put('/updateCliente/:id', db.updateCliente)
+app.delete('/deleteCliente/:id',db.elimCliente)
+//Crud Viajeros
+app.get('/viajeros', db.getViajeros)
+app.get('/viajero:id',db.getViajerosId)
+app.post('/registroViajeros/:id',db.registrarViajero)
+app.delete('/eliminarRegistroV/:id',db.elimRegViajero)
+app.post('/newViajero',db.createViajero)
+app.put('/updateViajero/:id', db.updateViajero)
+app.delete('/deleteViajero/:id',db.elimViajero)
 
 
 

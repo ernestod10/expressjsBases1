@@ -42,7 +42,7 @@ const pool = new Pool({
   const createProveedor = (request, response) => {
       const { numero_documento, nombre_proveedor, tipo_documento, telefono, tipo} = request.body
     
-      pool.query('INSERT INTO edw_proveedores (numero_documento_1, nombre_proveedor ,tipo_documento ,telefono ,tipo_proveedor) VALUES ($1, $2,$3,$4,$5)', [numero_documento, nombre_proveedor, tipo_documento, telefono, tipo], (error, results) => {
+      pool.query('INSERT INTO edw_proveedores (numero_documento_1, nombre_proveedor ,tipo_documento ,telefono_proovedor ,tipo_proveedor) VALUES ($1, $2,$3,$4,$5)', [numero_documento, nombre_proveedor, tipo_documento, telefono, tipo], (error, results) => {
         if (error) {
           throw error
         }
@@ -68,7 +68,7 @@ const pool = new Pool({
   const asociarseProveedor = (request,response)=> {
     const id = parseInt(request.params.id);
     const {id_proveedor}= request.body
-    pool.query('INSERT INTO EDW_proveedor_agencia (edw_agencia_id_agencia = $1, edw_proveedor_numero_documento_1 = $2, fecha_asociacion = current_date',
+    pool.query('INSERT INTO edw_proovedor_agencia (edw_agencia_id_agencia, edw_proveedores_numero_documento_1, fecha_asociacion) VALUES ($1,$2,current_date)',
     [id, id_proveedor],
     (error,results)=>{
       if (error){

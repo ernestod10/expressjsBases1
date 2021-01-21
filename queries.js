@@ -201,7 +201,7 @@ const pool = new Pool({
 //GET todos los Clientes de esta agencia por ID
 const getClientes= (request, response) => {
   const id_agencia = parseInt(request.params.id)
-pool.query('SELECT * from edw_cliente inner join edw_cliente_registro ecr on edw_cliente.id_cliente = ecr.edw_cliente_id_cliente WHERE edw_agencia_id_agencia = $1',[id_agencia], (error, results) => {
+pool.query('select * from edw_cliente_registro inner join edw_cliente ec on ec.id_cliente = edw_cliente_registro.edw_cliente_id_cliente where edw_agencia_id_agencia=$1',[id_agencia], (error, results) => {
 if (error) {
     throw error
 }

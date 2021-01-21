@@ -43,7 +43,7 @@ app.post('/newProveedor',db.createProveedor)
 app.put('/updateProveedor/:id', db.updateProveedor)
 app.delete('/deleteProveedor/:id',db.elimProveedor)
 //Crud Clientes
-app.get('/clientes', db.getClientes)
+app.get('/clientes/:id', db.getClientes)
 app.get('/cliente/:id',db.getClienteId)
 app.post('/registroCliente/:id',db.registrarCliente)
 app.delete('/eliminarRegistroC/:id',db.elimRegCliente)

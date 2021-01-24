@@ -60,8 +60,35 @@ app.put('/updateViajero/:id', db.updateViajero)
 app.delete('/deleteViajero/:id',db.elimViajero)
 
 
+//Crud Paquetes
+app.get('/paquetes', db.getPaquetes)
+app.get('/paquete:id',db.getPaqueteID)
+app.get('/ciudades',db.getCiudades)
+app.get('/atraccionesPaquete:id',db.getAtracciones)
+
+app.post('/nuevoPaquete',db.createPaquete)
+
+app.post('/nuevoCalendario',db.agregarCalendario)
+app.get('/calendario:id',db.getCalendario)
+app.delete('/eliminarCalendario/:id',db.elimCalendarioPaquete)
+
+app.post('/nuevoItinerario',db.agregarItinerarioPaquete)
+app.put('/editItinerario',db.editarItinerarioPaquete)
+app.delete('/eliminarItinerario/:id',db.elimItinerarioPaquete)
+
+app.post('/agregarAtraccion',db.agregarAtraccionPaquete)
+app.put('/editarAtraccion',db.agregarAtraccionPaquete)
+app.delete('/eliminarAtraccion/:id',db.elimAtraccionPaquete)
+
+app.delete('/eliminarRegistroV/:id',db.elimRegViajero)
+app.post('/newViajero',db.createViajero)
+app.put('/updatePaquete/:id', db.updatePaquete)
+app.put('/updatePrecio/:id',db.updatePrePaquete)
+app.delete('/deleteViajero/:id',db.elimViajero)
+
+
 
 
 app.listen(port, () => {
-    console.log(`App running on port ${port}.`)
+    console.log(`App running on localhost:${port}.`)
 })

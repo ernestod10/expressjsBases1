@@ -387,9 +387,206 @@ pool.query(' DELETE FROM edw_viajero WHERE id_viajero =$1', [id_viajero], (error
   response.status(200).send(results.rows)
 })
 }
+//MANTENIMIENTO DE PAQUETES
+/* _____________________________________________________________________________________________________________*/
+//GET todos los paquetes de la agencia
+const getPaquetes= (request, response) => {
+  const id_agencia = parseInt(request.params.id)
+  pool.query('select ep.*, ehpp.costo_base  from edw_paquete ep inner join edw_historico_precio_paquete ehpp on ep.id_paquete = ehpp.edw_paquete_id_paquete where ehpp.fecha_fin is NULL and ep.edw_agencia_id_agencia = $1',[id_agencia], (error, results) => {
+  if (error) {
+      throw error
+  }
+response.status(200).json(results.rows)
+})
+}
+//GET 1 paquete por ID
+const getPaqueteID= (request, response) => {
+  const id = parseInt(request.params.id)
+  pool.query('select ep.*, ehpp.costo_base  from edw_paquete ep inner join edw_historico_precio_paquete ehpp on ep.id_paquete = ehpp.edw_paquete_id_paquete where ehpp.fecha_fin is NULL and id_paquete = $1',[id], (error, results) => {
+  if (error) {
+      throw error
+  }
+response.status(200).json(results.rows)
+})
+}
+//UPDATE cambia 1 paquete por ID
+const updatePaquete = (request, response) => {
+  const id_paquete = parseInt(request.params.id)
+  const { nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_agencia_id_agencia, edw_ciudad_id_ciudad } = request.body
+  
+  pool.query(
+    'update edw_paquete set  nombre_paquete = $1, duracion_paquete_dias=$2, cantidad_personas=$3, descripcion=$4 ,edw_agencia_id_agencia=$5 , edw_ciudad_id_ciudad=$6 where id_paquete =$7',
+    [nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_agencia_id_agencia, edw_ciudad_id_ciudad,id_paquete],
+    (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send(results.rows)
+    }
+  )
+  }
+//UPDATE PRECIO
+  const updatePrePaquete = (request, response) => {
+    const id_paquete = parseInt(request.params.id)
+    const { Precio } = request.body
+    
+    pool.query(
+      'with first_insert as (UPDATE edw_historico_precio_paquete set fecha_fin=current_date where edw_paquete_id_paquete = $1 and fecha_fin is null returning edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) insert into edw_historico_precio_paquete(fecha_inicio, costo_base, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) values (current_date,$2,(select edw_paquete_id_paquete from first_insert ),(select first_insert.edw_paquete_edw_agencia_id_agencia from first_insert))',
+      [id_paquete,Precio],
+      (error, results) => {
+        if (error) {
+          throw error
+        }
+        response.status(200).send(results.rows)
+      }
+    )
+    }
+//GET todos las ciudades
+const getCiudades= (request, response) => {
+pool.query('select * from edw_ciudad', (error, results) => {
+if (error) {
+    throw error
+}
+response.status(200).json(results.rows)
+})
+}   
+//GET todos las atracciones de las ciudades del paquete 
+const getAtracciones= (request, response) => {
+  const id_paquete = parseInt(request.params.id)
+  pool.query('select id_atraccion, nombre_atraccion from edw_atraccion inner join edw_itinerario ei on edw_atraccion.edw_ciudad_id_ciudad = ei.edw_ciudad_id_ciudad where ei.edw_paquete_id_paquete = $1',[id_paquete], (error, results) => {
+  if (error) {
+      throw error
+  }
+  response.status(200).json(results.rows)
+  })
+  }  
+//CREATE 1 paquete
+const createPaquete = (request, response) => {
+  const { nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, id_ciudad, id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+
+  pool.query('insert into edw_paquete (nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_ciudad_id_ciudad, edw_agencia_id_agencia, edw_ciudad_edw_pais_id_pais) values ($1,$2,$3,$4,$5,$6,(select edw_pais_id_pais from edw_ciudad where id_ciudad = $5)) returning  id_paquete', 
+  [nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, id_ciudad, id_agencia], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(201).send(results.rows)
+  })
+  }
+const agregarCalendario = (request, response) => {
+  const { id_paquete, fecha_salida, descripcion, id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+
+  pool.query('insert into edw_calendario_anual (fechas_salida, descripcion, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) VALUES (1,2,3,4)', 
+  [fecha_salida, id_paquete, descripcion, id_agencia ], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(201).send(results.rows)
+  })
+}
+const getCalendario = (request, response) => {
+  const id_paquete = parseInt(request.params.id)
+  
+  pool.query('select * from edw_calendario_anual where edw_paquete_id_paquete = $1', [id_paquete], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send(results.rows)
+  })
+  }
+
+const elimCalendarioPaquete = (request, response) => {
+  const id_paquete = parseInt(request.params.id)
+  const {fecha_salida } = request.body
+  pool.query('delete from edw_calendario_anual where edw_paquete_id_paquete=$1 and fechas_salida=$2 ', [id_paquete,fecha_salida], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send(results.rows)
+  })
+  }
+const agregarItinerarioPaquete = (request, response) => {
+  const { orden, id_atraccion, id_paquete } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+    pool.query('insert into edw_itinerario (edw_paquete_id_paquete, edw_ciudad_id_ciudad, orden, tiempo_estadia, edw_paquete_edw_agencia_id_agencia, edw_ciudad_edw_pais_id_pais) VALUES (1,2,3,4,5,(select edw_pais_id_pais from edw_ciudad where id_ciudad=2))', 
+    [orden, id_atraccion, id_paquete], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(results.rows)
+    })
+    }
+const editarItinerarioPaquete = (request, response) => {
+  const { orden, tiempo_estadia, id_paquete, id_ciudad } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+
+  pool.query('update edw_itinerario set orden=$1, tiempo_estadia=$2 where edw_paquete_id_paquete=$3 and edw_ciudad_id_ciudad=$4', 
+  [orden, tiempo_estadia, id_paquete,id_ciudad], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(201).send(results.rows)
+  })
+  }
+const elimItinerarioPaquete = (request, response) => {
+    const id_paquete = parseInt(request.params.id)
+    const {id_ciudad } = request.body
+    pool.query('delete from edw_itinerario where edw_paquete_id_paquete = $1 and edw_ciudad_id_ciudad= $2', [id_paquete, id_ciudad], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send(results.rows)
+    })
+    }
+const agregarLugarPaquete = (request, response) => {
+    const { orden, id_atraccion, id_paquete } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+  
+    pool.query('insert into edw_paquete_atraccion (orden_de_visita, edw_atraccion_id_atraccion, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) values ($1,$2,$3,(select edw_agencia_id_agencia from edw_paquete where id_paquete=$3))', 
+    [orden, id_atraccion, id_paquete], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(201).send(results.rows)
+    })
+    }
+const editarLugarPaquete = (request, response) => {
+  const { orden, id_atraccion, id_paquete } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+
+  pool.query('update edw_paquete_atraccion set orden_de_visita=$1 where edw_atraccion_id_atraccion=$2 and edw_paquete_id_paquete=3', 
+  [orden, id_atraccion, id_paquete], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(201).send(results.rows)
+  })
+  }
+const elimLugarPaquete = (request, response) => {
+    const id_paquete = parseInt(request.params.id)
+    
+    pool.query(' delete from edw_paquete where id_paquete = $1', [id_paquete], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send(results.rows)
+    })
+    }
+//ELIMINA 1 paquete con ID
+const elimPaquete = (request, response) => {
+  const id_paquete = parseInt(request.params.id)
+  
+  pool.query(' delete from edw_paquete where id_paquete = $1', [id_paquete], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send(results.rows)
+  })
+  }
+
+
+//COMPRA DE 1 PAQUETE
+/* _____________________________________________________________________________________________________________*/
 
 
 
+//RALLIES
+/* _____________________________________________________________________________________________________________*/
 
 module.exports={
   //SOCIOS
@@ -429,4 +626,11 @@ module.exports={
   elimRegViajero,
   updateViajero,
   elimViajero
+  //MANTENIMIENTO DE PAQUETES
+
+  //VENTA DE PAQUETES
+
+  //RALLIES 
+
+
 }

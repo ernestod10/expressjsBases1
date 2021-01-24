@@ -535,7 +535,7 @@ const elimItinerarioPaquete = (request, response) => {
       response.status(200).send(results.rows)
     })
     }
-const agregarLugarPaquete = (request, response) => {
+const agregarAtraccionPaquete = (request, response) => {
     const { orden, id_atraccion, id_paquete } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
   
     pool.query('insert into edw_paquete_atraccion (orden_de_visita, edw_atraccion_id_atraccion, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) values ($1,$2,$3,(select edw_agencia_id_agencia from edw_paquete where id_paquete=$3))', 
@@ -546,7 +546,7 @@ const agregarLugarPaquete = (request, response) => {
       response.status(201).send(results.rows)
     })
     }
-const editarLugarPaquete = (request, response) => {
+const editarAtraccionPaquete = (request, response) => {
   const { orden, id_atraccion, id_paquete } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
   pool.query('update edw_paquete_atraccion set orden_de_visita=$1 where edw_atraccion_id_atraccion=$2 and edw_paquete_id_paquete=3', 
@@ -557,7 +557,7 @@ const editarLugarPaquete = (request, response) => {
     response.status(201).send(results.rows)
   })
   }
-const elimLugarPaquete = (request, response) => {
+const elimAtraccionPaquete = (request, response) => {
     const id_paquete = parseInt(request.params.id)
     
     pool.query(' delete from edw_paquete where id_paquete = $1', [id_paquete], (error, results) => {
@@ -587,6 +587,9 @@ const elimPaquete = (request, response) => {
 
 //RALLIES
 /* _____________________________________________________________________________________________________________*/
+
+
+
 
 module.exports={
   //SOCIOS
@@ -625,8 +628,25 @@ module.exports={
   registrarViajero,
   elimRegViajero,
   updateViajero,
-  elimViajero
+  elimViajero,
   //MANTENIMIENTO DE PAQUETES
+  getPaquetes,
+  getPaqueteID,
+  updatePaquete,
+  updatePrePaquete,
+  getCiudades,
+  getAtracciones,
+  createPaquete,
+  agregarCalendario,
+  getCalendario,
+  elimCalendarioPaquete,
+  agregarItinerarioPaquete,
+  editarItinerarioPaquete,
+  elimItinerarioPaquete,
+  agregarAtraccionPaquete,
+  editarAtraccionPaquete,
+  elimAtraccionPaquete,
+  elimPaquete,
 
   //VENTA DE PAQUETES
 

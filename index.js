@@ -86,7 +86,12 @@ app.put('/updatePaquete/:id', db.updatePaquete)
 app.put('/updatePrecio/:id',db.updatePrePaquete)
 app.delete('/deleteViajero/:id',db.elimViajero)
 
+//compra Paquete
+app.get('/paquetesCompra',db.getPaquetesCliente)
+app.post('/pago/:id',db.pago)
+app.post('/recibo:id',db.recibo)
 
+//CRUD RALLY
 
 
 app.listen(port, () => {

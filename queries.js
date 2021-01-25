@@ -593,9 +593,9 @@ response.status(200).json(results.rows)
 }
 const pago = (request,response)=>{
   const id_paquete = parseInt(request.params.id)
-  const { fecha_viaje, email } = request.body
-    pool.query('with reserva as (Insert into edw_pqt_contrato (monto_total, edw_asesor_viaje_id_asesor, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia, fecha_aprobado, fecha_emitido, fecha_viaje, numero_factura, email)VALUES ((SELECT hp.costo_base from edw_historico_precio_paquete hp where hp.edw_paquete_id_paquete =1 and hp.fecha_fin is null),0,1,(select edw_agencia_id_agencia from edw_paquete where id_paquete=1),current_date,current_date,2,edw_pqt_contrato_seq.max_value,3) returning id_paquete_contrato), pago as(Insert into edw_metodo_pago (descripcion_metodo_pago, tipo, numero_cuenta, email, edw_cliente_id_cliente, edw_cliente_edw_asesor_viaje_id_asesor, edw_banco_id) VALUES ("a",4,5,3,1,0,6) returning id_metodo_pago) insert into edw_forma_pago (tipo, edw_pqt_contrato_id_paquete_contrato, edw_metodo_pago_id_metodo_pago, edw_metodo_pago_edw_cliente_id_cliente, edw_metodo_pago_edw_cliente_edw_asesor_viaje_id_asesor)VALUES (4,(select id_paquete_contrato from reserva),(select id_metodo_pago from pago),1,0))',
-    [id_paquete,fecha_viaje,email],(error, results) => {
+  const { fecha_viaje, email, tipo_pago,numero_cuenta,id_banco } = request.body
+    pool.query('with reserva as (Insert into edw_pqt_contrato (monto_total, edw_asesor_viaje_id_asesor, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia, fecha_aprobado, fecha_emitido, fecha_viaje, numero_factura, email)VALUES ((SELECT hp.costo_base from edw_historico_precio_paquete hp where hp.edw_paquete_id_paquete =$1 and hp.fecha_fin is null),0,$1,(select edw_agencia_id_agencia from edw_paquete where id_paquete=$1),current_date,current_date,$2,(SELECT last_value FROM edw_pqt_contrato_seq),$3) returning id_paquete_contrato), pago as(Insert into edw_metodo_pago (descripcion_metodo_pago, tipo, numero_cuenta, email, edw_cliente_id_cliente, edw_cliente_edw_asesor_viaje_id_asesor, edw_banco_id) VALUES ("a",$4,$5,$3,1,0,$6) returning id_metodo_pago) insert into edw_forma_pago (tipo, edw_pqt_contrato_id_paquete_contrato, edw_metodo_pago_id_metodo_pago, edw_metodo_pago_edw_cliente_id_cliente, edw_metodo_pago_edw_cliente_edw_asesor_viaje_id_asesor)VALUES ($4,(select id_paquete_contrato from reserva),(select id_metodo_pago from pago),1,0))returning (select re.id_paquete_contrato, pg.id_metodo_pago from reserva re, pago pg ) ',
+    [id_paquete,fecha_viaje,email, tipo_pago,numero_cuenta,id_banco],(error, results) => {
       if (error) {
           throw error
       }
@@ -603,9 +603,20 @@ const pago = (request,response)=>{
     })
 
 }
+const recibo =(request,response)=>{
+  const id_paquete_contrato = parseInt(request.params.id)
+  const {id_pago, id_cliente} =request.body
+    pool.query('insert into edw_recibo (fecha_recibo, edw_forma_pago_edw_pqt_contrato_id_paquete_contrato, edw_forma_pago_edw_metodo_pago_id_metodo_pago, edw_forma_pago_edw_metodo_pago_edw_cliente_id_cliente, edw_fp_edw_metodo_pago_edw_cliente_edw_asesor_viaje_id_asesor) VALUES (current_date,$1,$2,$3,0)',
+    [id_paquete_contrato,id_pago,id_cliente],(error,results)=>{
+      if (error) {
+        throw error
+    }
+  response.status(200).json(results.rows)
+    }
+    
+    )
 
-
-
+}
 //RALLIES
 /* _____________________________________________________________________________________________________________*/
 
@@ -670,7 +681,9 @@ module.exports={
   elimPaquete,
 
   //VENTA DE PAQUETES
-
+  getPaquetesCliente,
+  pago,
+  recibo,
   //RALLIES 
 
 

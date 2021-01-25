@@ -17,10 +17,10 @@ const pool = new Pool({
       response.status(200).json(results.rows)
       })
   }
-  //GET todos los proovedores asociados a la agencia
+  //GET todos los proveedores asociados a la agencia
   const getProveedoresAsociados = (request, response) => {
     const id = parseInt(request.params.id) //este id siempre pasalo como 1 ya que solo vamos a ver 1 agencia
-    pool.query('SELECT * FROM edw_proveedores inner join edw_proovedor_agencia epa on edw_proveedores.numero_documento_1 = epa.edw_proveedores_numero_documento_1 where epa.edw_agencia_id_agencia = $1', [id], (error, results) => {
+    pool.query('SELECT * FROM edw_proveedores inner join edw_proveedor_agencia epa on edw_proveedores.numero_documento_1 = epa.edw_proveedores_numero_documento_1 where epa.edw_agencia_id_agencia = $1', [id], (error, results) => {
     if (error) {
         throw error
     }
@@ -42,7 +42,7 @@ const pool = new Pool({
   const createProveedor = (request, response) => {
       const { numero_documento, nombre_proveedor, tipo_documento, telefono, tipo} = request.body
     
-      pool.query('INSERT INTO edw_proveedores (numero_documento_1, nombre_proveedor ,tipo_documento ,telefono_proovedor ,tipo_proveedor) VALUES ($1, $2,$3,$4,$5)', [numero_documento, nombre_proveedor, tipo_documento, telefono, tipo], (error, results) => {
+      pool.query('INSERT INTO edw_proveedores (numero_documento_1, nombre_proveedor ,tipo_documento ,telefono_proveedor ,tipo_proveedor) VALUES ($1, $2,$3,$4,$5)', [numero_documento, nombre_proveedor, tipo_documento, telefono, tipo], (error, results) => {
         if (error) {
           throw error
         }
@@ -68,7 +68,7 @@ const pool = new Pool({
   const asociarseProveedor = (request,response)=> {
     const id = parseInt(request.params.id);
     const {id_proveedor}= request.body
-    pool.query('INSERT INTO edw_proovedor_agencia (edw_agencia_id_agencia, edw_proveedores_numero_documento_1, fecha_asociacion) VALUES ($1,$2,current_date)',
+    pool.query('INSERT INTO edw_proveedor_agencia (edw_agencia_id_agencia, edw_proveedores_numero_documento_1, fecha_asociacion) VALUES ($1,$2,current_date)',
     [id, id_proveedor],
     (error,results)=>{
       if (error){
@@ -582,6 +582,27 @@ const elimPaquete = (request, response) => {
 
 //COMPRA DE 1 PAQUETE
 /* _____________________________________________________________________________________________________________*/
+//Muestra todos los paquetes
+const getPaquetesCliente = (request, response) => {
+  pool.query('select ep.* ,ehpp.costo_base, ec.continente from edw_paquete ep inner join edw_historico_precio_paquete ehpp on ep.id_paquete = ehpp.edw_paquete_id_paquete inner join edw_pais ec on ep.edw_ciudad_edw_pais_id_pais = ec.id_pais where fecha_fin is null order by continente', (error, results) => {
+  if (error) {
+      throw error
+  }
+response.status(200).json(results.rows)
+})
+}
+const pago = (request,response)=>{
+  const id_paquete = parseInt(request.params.id)
+  const { fecha_viaje, email } = request.body
+    pool.query('with reserva as (Insert into edw_pqt_contrato (monto_total, edw_asesor_viaje_id_asesor, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia, fecha_aprobado, fecha_emitido, fecha_viaje, numero_factura, email)VALUES ((SELECT hp.costo_base from edw_historico_precio_paquete hp where hp.edw_paquete_id_paquete =1 and hp.fecha_fin is null),0,1,(select edw_agencia_id_agencia from edw_paquete where id_paquete=1),current_date,current_date,2,edw_pqt_contrato_seq.max_value,3) returning id_paquete_contrato), pago as(Insert into edw_metodo_pago (descripcion_metodo_pago, tipo, numero_cuenta, email, edw_cliente_id_cliente, edw_cliente_edw_asesor_viaje_id_asesor, edw_banco_id) VALUES ("a",4,5,3,1,0,6) returning id_metodo_pago) insert into edw_forma_pago (tipo, edw_pqt_contrato_id_paquete_contrato, edw_metodo_pago_id_metodo_pago, edw_metodo_pago_edw_cliente_id_cliente, edw_metodo_pago_edw_cliente_edw_asesor_viaje_id_asesor)VALUES (4,(select id_paquete_contrato from reserva),(select id_metodo_pago from pago),1,0))',
+    [id_paquete,fecha_viaje,email],(error, results) => {
+      if (error) {
+          throw error
+      }
+    response.status(200).json(results.rows)
+    })
+
+}
 
 
 

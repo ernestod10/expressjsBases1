@@ -412,11 +412,11 @@ response.status(200).json(results.rows)
 //UPDATE cambia 1 paquete por ID
 const updatePaquete = (request, response) => {
   const id_paquete = parseInt(request.params.id)
-  const { nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_agencia_id_agencia, edw_ciudad_id_ciudad } = request.body
+  const { nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_agencia_id_agencia } = request.body
   
   pool.query(
-    'update edw_paquete set  nombre_paquete = $1, duracion_paquete_dias=$2, cantidad_personas=$3, descripcion=$4 ,edw_agencia_id_agencia=$5 , edw_ciudad_id_ciudad=$6 where id_paquete =$7',
-    [nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_agencia_id_agencia, edw_ciudad_id_ciudad,id_paquete],
+    'update edw_paquete set  nombre_paquete = $1, duracion_paquete_dias=$2, cantidad_personas=$3, descripcion=$4 ,edw_agencia_id_agencia=$5 id_paquete =$6',
+    [nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_agencia_id_agencia,id_paquete],
     (error, results) => {
       if (error) {
         throw error
@@ -462,10 +462,10 @@ const getAtracciones= (request, response) => {
   }  
 //CREATE 1 paquete
 const createPaquete = (request, response) => {
-  const { nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, id_ciudad, id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+  const { nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion,  id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
-  pool.query('insert into edw_paquete (nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_ciudad_id_ciudad, edw_agencia_id_agencia, edw_ciudad_edw_pais_id_pais) values ($1,$2,$3,$4,$5,$6,(select edw_pais_id_pais from edw_ciudad where id_ciudad = $5)) returning  id_paquete', 
-  [nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, id_ciudad, id_agencia], (error, results) => {
+  pool.query('insert into edw_paquete (nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_agencia_id_agencia) values ($1,$2,$3,$4,$5) returning  id_paquete', 
+  [nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, id_agencia], (error, results) => {
     if (error) {
       throw error
     }
@@ -665,6 +665,20 @@ const addRallyCiudad = (request,response)=>{
   })
 
 }
+const deleteRallyCiudad = (request,response)=>{
+  const id_rally =parseInt(request.params.id)
+  const {id_ciudad}=request.body
+  pool.query('with bciduad as (delete from edw_rally_ciudad where edw_rally_id_rally=$1 and edw_ciudad_id_ciudad=$2 returning $2 ciudad) delete from edw_atraccion_rally t1 using edw_atraccion t2 where t2.id_atraccion =t1.edw_atraccion_id_atraccion and t2.edw_ciudad_id_ciudad=bciduad.ciudad and t1.edw_rally_id_rally=$1',
+  [id_rally,id_ciudad],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+
+  })
+
+}
+
 const GetAtraccionesRally = (request,response)=>{
   const id_rally =parseInt(request.params.id)
   pool.query('Select id_atraccion,nombre_atraccion,nombre_ciudad from edw_atraccion inner join edw_ciudad ec on ec.id_ciudad = edw_atraccion.edw_ciudad_id_ciudad inner join edw_rally_ciudad erc on ec.id_ciudad = erc.edw_ciudad_id_ciudad where erc.edw_rally_id_rally=$1',
@@ -759,6 +773,7 @@ const updatePremioRally = (request,response)=>{
 
 
 
+
 module.exports={
   //SOCIOS
   //PROVEEDORES
@@ -817,9 +832,12 @@ module.exports={
   elimPaquete,
 
   //VENTA DE PAQUETES
+  
   getPaquetesCliente,
   pago,
   recibo,
+
+
   //RALLIES 
   getRallies,
   getRalliesAgencia,
@@ -831,5 +849,8 @@ module.exports={
   getPremiosRally,
   deletePremioRally,
   updatePremioRally,
+  deleteRallyAtraccion,
+  deleteRallyCiudad,
+
 
 }

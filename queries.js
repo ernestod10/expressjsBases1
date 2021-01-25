@@ -2,8 +2,8 @@ const Pool = require('pg').Pool
 const pool = new Pool({
   user: 'postgres', //Aqui pongan su user
   host: 'localhost',
-  database: 'Bases1', //el nombre de su BD
-  password: '0809',           //y la contraseña
+  database: 'proyecto', //el nombre de su BD
+  password: '1212',           //y la contraseña
   port: 5432,
 })
 // SOCIOS proveedores
@@ -17,7 +17,7 @@ const pool = new Pool({
       response.status(200).json(results.rows)
       })
   }
-  //GET todos los proveedores asociados a la agencia
+  //GET todos los proovedores asociados a la agencia
   const getProveedoresAsociados = (request, response) => {
     const id = parseInt(request.params.id) //este id siempre pasalo como 1 ya que solo vamos a ver 1 agencia
     pool.query('SELECT * FROM edw_proveedores inner join edw_proveedor_agencia epa on edw_proveedores.numero_documento_1 = epa.edw_proveedores_numero_documento_1 where epa.edw_agencia_id_agencia = $1', [id], (error, results) => {
@@ -40,9 +40,9 @@ const pool = new Pool({
     }
   //CREATE 1 Proveedor 
   const createProveedor = (request, response) => {
-      const { numero_documento, nombre_proveedor, tipo_documento, telefono, tipo} = request.body
+      const { numero_documento_1, nombre_proveedor, tipo_documento, telefono_proveedor, tipo_proveedor} = request.body
     
-      pool.query('INSERT INTO edw_proveedores (numero_documento_1, nombre_proveedor ,tipo_documento ,telefono_proveedor ,tipo_proveedor) VALUES ($1, $2,$3,$4,$5)', [numero_documento, nombre_proveedor, tipo_documento, telefono, tipo], (error, results) => {
+      pool.query('INSERT INTO edw_proveedores (numero_documento_1, nombre_proveedor ,tipo_documento ,telefono_proveedor ,tipo_proveedor) VALUES ($1, $2,$3,$4,$5)', [numero_documento_1, nombre_proveedor, tipo_documento, telefono_proveedor, tipo_proveedor], (error, results) => {
         if (error) {
           throw error
         }
@@ -52,10 +52,10 @@ const pool = new Pool({
   //UPDATE cambia 1 proveedor por ID
   const updateProveedor = (request, response) => {
     const id = parseInt(request.params.id);
-    const { numero_documento, nombre_proveedor, tipo_documento, telefono, tipo } = request.body
+    const { numero_documento_1, nombre_proveedor, tipo_documento, telefono_proveedor, tipo_proveedor } = request.body
   
-    pool.query('UPDATE edw_proveedores SET numero_documento_1 = $1, nombre_proveedor = $2,tipo_documento = $3,telefono =$4 ,tipo=$5 WHERE numero_documento_1 = $6',
-      [numero_documento, nombre_proveedor, tipo_documento, telefono, tipo, id],
+    pool.query('UPDATE edw_proveedores SET numero_documento_1 = $1, nombre_proveedor = $2,tipo_documento = $3,telefono_proveedor =$4 ,tipo_proveedor=$5 WHERE numero_documento_1 = $6',
+      [numero_documento_1, nombre_proveedor, tipo_documento, telefono_proveedor, tipo_proveedor, id],
       (error, results) => {
         if (error) {
           throw error
@@ -68,7 +68,7 @@ const pool = new Pool({
   const asociarseProveedor = (request,response)=> {
     const id = parseInt(request.params.id);
     const {id_proveedor}= request.body
-    pool.query('INSERT INTO edw_proveedor_agencia (edw_agencia_id_agencia, edw_proveedores_numero_documento_1, fecha_asociacion) VALUES ($1,$2,current_date)',
+    pool.query('INSERT INTO edw_proovedor_agencia (edw_agencia_id_agencia, edw_proveedores_numero_documento_1, fecha_asociacion) VALUES ($1,$2,current_date)',
     [id, id_proveedor],
     (error,results)=>{
       if (error){
@@ -126,7 +126,7 @@ const pool = new Pool({
   const getAgenciaId = (request, response) => {
     const id = parseInt(request.params.id)
 
-    pool.query('select * from edw_agencia where edw_agencia_id_agencia = $1', [id], (error, results) => {
+    pool.query('select * from edw_agencia where edw_agencia.id_agencia = $1', [id], (error, results) => {
       if (error) {
         throw error
       }
@@ -147,9 +147,9 @@ const pool = new Pool({
   //Asociarse A 1 Agencia
   const asociarseAgencia = (request, response) => {
     const id = parseInt(request.params.id)
-    const { id_agencia_socia } = request.body
+    const { id_agencia } = request.body
     
-    pool.query('INSERT INTO edw_socios (fecha_asociacion, edw_agencia_id_agencia, edw_agencia_id_agencia2) VALUES (CURRENT_DATE,$1,$2)', [id,id_agencia_socia], (error, results) => {
+    pool.query('INSERT INTO edw_socios (fecha_asociacion, edw_agencia_id_agencia, edw_agencia_id_agencia1) VALUES (CURRENT_DATE,$1,$2)', [id,id_agencia], (error, results) => {
       if (error) {
         throw error
       }
@@ -158,10 +158,12 @@ const pool = new Pool({
     }
   //Desasociarse A 1 Agencia
   const desasociarseAgencia = (request, response) => {
-  const id = parseInt(request.params.id)
-  const { id_agencia_socia } = request.body
-
-  pool.query('DELETE FROM edw_socios WHERE (edw_agencia_id_agencia =$1 and edw_agencia_id_agencia2 =$2) or(edw_agencia_id_agencia=$2 and edw_agencia_id_agencia2=$1) ', [id,id_agencia_socia], (error, results) => {
+    const ayudante = request.params.id;
+    const p = ayudante.split(' ');
+    const id = parseInt(p[0]);
+    const id_agencia= parseInt(p[1]);
+  
+  pool.query('DELETE FROM edw_socios WHERE (edw_agencia_id_agencia =$1 and edw_agencia_id_agencia1 =$2) or(edw_agencia_id_agencia=$2 and edw_agencia_id_agencia1=$1) ', [id,id_agencia], (error, results) => {
     if (error) {
       throw error
     }
@@ -267,11 +269,11 @@ const elimRegCliente = (request, response) => {
 //UPDATE cambia 1 Cliente por ID
 const updateCliente = (request, response) => {
 const id_cliente = parseInt(request.params.id)
-const { nombre, tipo, apellido_1, apellido_2, asesor_id } = request.body
+const { nombre_cliente, tipo, apellido_1, apellido_2, asesor_id } = request.body
 
 pool.query(
   'UPDATE edw_cliente set nombre_cliente=$1 ,tipo=$2 ,apellido_1=$3 ,apellido_2=$4 ,edw_asesor_viaje_id_asesor=$5 WHERE id_cliente = $6',
-  [nombre, tipo, apellido_1, apellido_2, asesor_id, id_cliente],
+  [nombre_cliente, tipo, apellido_1, apellido_2, asesor_id, id_cliente],
   (error, results) => {
     if (error) {
       throw error
@@ -296,7 +298,7 @@ pool.query(' DELETE FROM edw_cliente WHERE id_cliente =$1', [id_cliente], (error
 //GET todos los Viajeros de esta agencia por ID
 const getViajeros= (request, response) => {
   const id_agencia = parseInt(request.params.id)
-pool.query('SELECT * FROM edw_viajero INNER JOIN edw_reg_viajero erv on edw_viajero.id_viajero = erv.edw_viajero_id_viajero WHERE ERV.edw_agencia_id_agencia = $1',[id_agencia], (error, results) => {
+pool.query('SELECT * FROM edw_viajero INNER JOIN edw_reg_viajero erv on edw_viajero.id_viajero = erv.edw_viajero_id_viajero WHERE erv.edw_agencia_id_agencia = $1',[id_agencia], (error, results) => {
 if (error) {
     throw error
 }
@@ -327,10 +329,10 @@ const getRegViajeroId = (request, response) => {
   }
 //CREATE 1 Cliente
 const createViajero = (request, response) => {
-  const { primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, genero, id_ciudad, id_pais } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+  const { primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, genero, edw_ciudad_id_ciudad, edw_ciudad_edw_pais_id_pais } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
   pool.query('INSERT INTO edw_viajero (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, genero, edw_ciudad_id_ciudad, edw_ciudad_edw_pais_id_pais) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)', 
-  [primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, genero, id_ciudad, id_pais], (error, results) => {
+  [primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, genero, edw_ciudad_id_ciudad, edw_ciudad_edw_pais_id_pais], (error, results) => {
     if (error) {
       throw error
     }
@@ -363,11 +365,11 @@ const elimRegViajero = (request, response) => {
 //UPDATE cambia 1 viajero por ID
 const updateViajero = (request, response) => {
 const id_viajero = parseInt(request.params.id)
-const { primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, genero, id_ciudad, id_pais } = request.body
+const { primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, genero, edw_ciudad_id_ciudad, edw_ciudad_edw_pais_id_pais } = request.body
 
 pool.query(
   'UPDATE edw_viajero set primer_nombre=$1, segundo_nombre=$2, primer_apellido=$3, segundo_apellido=$4, fecha_nacimiento=$5, genero=$6, edw_ciudad_id_ciudad=$7, edw_ciudad_edw_pais_id_pais=$8 WHERE id_viajero=$9',
-  [primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, genero, id_ciudad, id_pais, id_viajero],
+  [primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, genero, edw_ciudad_id_ciudad, edw_ciudad_edw_pais_id_pais, id_viajero],
   (error, results) => {
     if (error) {
       throw error
@@ -754,7 +756,6 @@ const updatePremioRally = (request,response)=>{
   })
 
 }
-
 
 
 

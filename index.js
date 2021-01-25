@@ -26,7 +26,7 @@ app.get('/', (request, response) => {
 
 //Crud Agencias
 app.get('/agencias', db.getAgencias)
-app.get('/agenciasSocias/:id',db.getAgenciasSocias)
+app.get('/agenciasSocios/:id',db.getAgenciasSocias)
 app.get('/agencias/:id', db.getAgenciaId)
 app.post('/asociarAgencia/:id',db.asociarseAgencia)
 app.delete('/desasociarAgencia/:id',db.desasociarseAgencia)
@@ -35,7 +35,7 @@ app.put('/updateAgencia/:id', db.updateAgencia)
 app.delete('/deleteAgencia/:id',db.elimAgencia)
 //Crud Proveedores
 app.get('/proveedores', db.getProveedores)
-app.get('/proveedoresSocias/:id',db.getProveedorId)
+app.get('/proveedoresSocios/:id',db.getProveedorId)
 app.get('/proveedor/:id', db.getProveedoresAsociados)
 app.post('/asociarProveedor/:id',db.asociarseProveedor)
 app.delete('/desasociarProveedor/:id',db.desasociarseProveedor)
@@ -46,13 +46,13 @@ app.delete('/deleteProveedor/:id',db.elimProveedor)
 app.get('/clientes/:id', db.getClientes)
 app.get('/cliente/:id',db.getClienteId)
 app.post('/registroCliente/:id',db.registrarCliente)
-app.delete('/eliminarRegistroC/:id',db.elimRegCliente)
+app.delete('/eliminarRegistro/:id',db.elimRegCliente)
 app.post('/newCliente',db.createCliente)
 app.put('/updateCliente/:id', db.updateCliente)
 app.delete('/deleteCliente/:id',db.elimCliente)
 //Crud Viajeros
-app.get('/viajeros', db.getViajeros)
-app.get('/viajero:id',db.getViajerosId)
+app.get('/viajeros/:id', db.getViajeros)
+app.get('/viajero/:id',db.getViajerosId)
 app.post('/registroViajeros/:id',db.registrarViajero)
 app.delete('/eliminarRegistroV/:id',db.elimRegViajero)
 app.post('/newViajero',db.createViajero)
@@ -86,12 +86,12 @@ app.put('/updatePaquete/:id', db.updatePaquete)
 app.put('/updatePrecio/:id',db.updatePrePaquete)
 app.delete('/deleteViajero/:id',db.elimViajero)
 
+
 //compra Paquete
 app.get('/paquetesCompra',db.getPaquetesCliente)
 app.post('/pago/:id',db.pago)
 app.post('/recibo:id',db.recibo)
 
-//CRUD RALLY
 
 
 app.listen(port, () => {

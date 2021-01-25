@@ -619,6 +619,142 @@ const recibo =(request,response)=>{
 }
 //RALLIES
 /* _____________________________________________________________________________________________________________*/
+const getRallies = (request,response)=>{
+  pool.query('select * from edw_rally',(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+  })
+
+}
+const getRalliesAgencia = (request,response)=>{
+  const id_agencia = parseInt(request.params.id)
+  pool.query('select * from edw_rally inner join edw_agencia_rally ear on edw_rally.id_rally = ear.edw_rally_id_rally where ear.edw_agencia_id_agencia =$1',
+    [id_agencia],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+  })
+
+}
+
+const createRally = (request,response)=>{
+  const id_agencia = parseInt(request.params.id)
+  const {fecha_inicio, precio, fecha_tope,nombre,descripcion,tipo}=request.body
+  pool.query('with rally as (insert into edw_rally (fecha_inicio_rally, precio_rally, fecha_tope, nombre, descripcion, tipo) VALUES (1,2,3,4,5,6) returning id_rally) insert into edw_agencia_rally (edw_agencia_id_agencia, edw_rally_id_rally) VALUES (7,(select id_rally from rally))returning (select id_rally from rally)',
+    [fecha_inicio, precio, fecha_tope,nombre,descripcion,tipo,id_agencia],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+  })
+
+}
+const addRallyCiudad = (request,response)=>{
+  const id_rally =parseInt(request.params.id)
+  const {id_ciudad,posicion,maximo_dias}=request.body
+  pool.query('insert into edw_rally_ciudad (edw_rally_id_rally, edw_ciudad_id_ciudad, posicion_lugar, maximo_dias, edw_ciudad_edw_pais_id_pais) VALUES ($1,$2,$3,$4,(select edw_ciudad_edw_pais_id_pais from edw_ciudad where id_ciudad=$2))',
+  [id_rally,id_ciudad,posicion,maximo_dias],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+
+  })
+
+}
+const GetAtraccionesRally = (request,response)=>{
+  const id_rally =parseInt(request.params.id)
+  pool.query('Select id_atraccion,nombre_atraccion,nombre_ciudad from edw_atraccion inner join edw_ciudad ec on ec.id_ciudad = edw_atraccion.edw_ciudad_id_ciudad inner join edw_rally_ciudad erc on ec.id_ciudad = erc.edw_ciudad_id_ciudad where erc.edw_rally_id_rally=$1',
+  [id_rally],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+
+  })
+
+}
+
+const addRallyAtraccion = (request,response)=>{
+  const id_rally =parseInt(request.params.id)
+  const {id_atraccion}=request.body
+  pool.query('INSERT INTO edw_atraccion_rally (edw_rally_id_rally, edw_atraccion_id_atraccion) VALUES ($1,$2)',
+  [id_rally,id_atraccion],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+
+  })
+
+}
+const deleteRallyAtraccion = (request,response)=>{
+  const id_rally =parseInt(request.params.id)
+  const {id_atraccion}=request.body
+  pool.query('delete from edw_atraccion_rally where edw_rally_id_rally=$1 and edw_atraccion_id_atraccion=$2',
+  [id_rally,id_atraccion],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+
+  })
+
+}
+const addPremioRally = (request,response)=>{
+  const id_rally =parseInt(request.params.id)
+  const {nombre,posicion}=request.body
+  pool.query('insert into edw_premio_rally (nombre_premio, posicion_participante, edw_rally_id_rally) VALUES ($1,$2,$3)',
+  [nombre,posicion,id_rally],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+
+  })
+
+}
+const getPremiosRally = (request,response)=>{
+  const id_rally =parseInt(request.params.id)
+  pool.query('select * from edw_premio_rally where edw_rally_id_rally =$1',
+  [id_rally],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+
+  })
+
+}
+const deletePremioRally = (request,response)=>{
+  const id_premio =parseInt(request.params.id)
+  pool.query('delete from edw_premio_rally where id_premio =$1',
+  [id_premio],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+
+  })
+
+}
+const updatePremioRally = (request,response)=>{
+  const id_premio =parseInt(request.params.id)
+  const {nombre,posicion}=request.body
+  pool.query('update edw_premio_rally set nombre_premio=$1,posicion_participante=$2 where id_premio=$3',
+  [nombre,posicion,id_premio],(error,results)=>{
+    if (error) {
+      throw error
+  }
+      response.status(200).json(results.rows)
+
+  })
+
+}
+
 
 
 
@@ -685,6 +821,15 @@ module.exports={
   pago,
   recibo,
   //RALLIES 
-
+  getRallies,
+  getRalliesAgencia,
+  createRally,
+  addRallyCiudad,
+  GetAtraccionesRally,
+  addRallyAtraccion,
+  addPremioRally,
+  getPremiosRally,
+  deletePremioRally,
+  updatePremioRally,
 
 }

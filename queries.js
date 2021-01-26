@@ -431,7 +431,7 @@ const updatePaquete = (request, response) => {
     const { Precio } = request.body
     
     pool.query(
-      'with first_insert as (UPDATE edw_historico_precio_paquete set fecha_fin=current_date where edw_paquete_id_paquete = $1 and fecha_fin is null returning edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) insert into edw_historico_precio_paquete(fecha_inicio, costo_base, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) values (current_date,$2,(select edw_paquete_id_paquete from first_insert ),(select first_insert.edw_paquete_edw_agencia_id_agencia from first_insert))',
+      'with first_insert as (UPDATE edw_historico_precio_paquete set fecha_fin=current_date  where edw_paquete_id_paquete = $1 and fecha_fin is null) insert into edw_historico_precio_paquete(fecha_inicio, costo_base, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) values (current_date,$2,$1,(select edw_agencia_id_agencia from edw_paquete where id_paquete=$1))',
       [id_paquete,Precio],
       (error, results) => {
         if (error) {

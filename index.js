@@ -62,14 +62,14 @@ app.delete('/deleteViajero/:id',db.elimViajero)
 
 //Crud Paquetes
 app.get('/paquetes', db.getPaquetes)
-app.get('/paquete:id',db.getPaqueteID)
+app.get('/paquete/:id',db.getPaqueteID)
 app.get('/ciudades',db.getCiudades)
-app.get('/atraccionesPaquete:id',db.getAtracciones)
+app.get('/atraccionesPaquete/:id',db.getAtracciones)
 
 app.post('/nuevoPaquete',db.createPaquete)
 
 app.post('/nuevoCalendario',db.agregarCalendario)
-app.get('/calendario:id',db.getCalendario)
+app.get('/calendario/:id',db.getCalendario)
 app.delete('/eliminarCalendario/:id',db.elimCalendarioPaquete)
 
 app.post('/nuevoItinerario',db.agregarItinerarioPaquete)

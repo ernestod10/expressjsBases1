@@ -475,7 +475,7 @@ const createPaquete = (request, response) => {
 const agregarCalendario = (request, response) => {
   const { id_paquete, fecha_salida, descripcion, id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
-  pool.query('insert into edw_calendario_anual (fechas_salida, descripcion, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) VALUES (1,2,3,4)', 
+  pool.query('insert into edw_calendario_anual (fechas_salida, descripcion, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) VALUES ($1,$2,$3,$4)', 
   [fecha_salida, id_paquete, descripcion, id_agencia ], (error, results) => {
     if (error) {
       throw error
@@ -505,9 +505,9 @@ const elimCalendarioPaquete = (request, response) => {
   })
   }
 const agregarItinerarioPaquete = (request, response) => {
-  const { orden, id_atraccion, id_paquete } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
-    pool.query('insert into edw_itinerario (edw_paquete_id_paquete, edw_ciudad_id_ciudad, orden, tiempo_estadia, edw_paquete_edw_agencia_id_agencia, edw_ciudad_edw_pais_id_pais) VALUES (1,2,3,4,5,(select edw_pais_id_pais from edw_ciudad where id_ciudad=2))', 
-    [orden, id_atraccion, id_paquete], (error, results) => {
+  const { orden, id_paquete, id_ciudad,id_agencia,tiempo_estadia } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+    pool.query('insert into edw_itinerario (edw_paquete_id_paquete, edw_ciudad_id_ciudad, orden, tiempo_estadia, edw_paquete_edw_agencia_id_agencia, edw_ciudad_edw_pais_id_pais)VALUES ($1,$2,$3,$4,$5,(select edw_pais_id_pais from edw_ciudad where id_ciudad=$2))', 
+    [id_paquete,id_ciudad,orden,tiempo_estadia,id_agencia], (error, results) => {
       if (error) {
         throw error
       }
@@ -549,7 +549,7 @@ const agregarAtraccionPaquete = (request, response) => {
 const editarAtraccionPaquete = (request, response) => {
   const { orden, id_atraccion, id_paquete } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
-  pool.query('update edw_paquete_atraccion set orden_de_visita=$1 where edw_atraccion_id_atraccion=$2 and edw_paquete_id_paquete=3', 
+  pool.query('update edw_paquete_atraccion set orden_de_visita=$1 where edw_atraccion_id_atraccion=$2 and edw_paquete_id_paquete=$3', 
   [orden, id_atraccion, id_paquete], (error, results) => {
     if (error) {
       throw error
@@ -593,9 +593,9 @@ response.status(200).json(results.rows)
 }
 const pago = (request,response)=>{
   const id_paquete = parseInt(request.params.id)
-  const { fecha_viaje, email, tipo_pago,numero_cuenta,id_banco } = request.body
-    pool.query('with reserva as (Insert into edw_pqt_contrato (monto_total, edw_asesor_viaje_id_asesor, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia, fecha_aprobado, fecha_emitido, fecha_viaje, numero_factura, email)VALUES ((SELECT hp.costo_base from edw_historico_precio_paquete hp where hp.edw_paquete_id_paquete =$1 and hp.fecha_fin is null),0,$1,(select edw_agencia_id_agencia from edw_paquete where id_paquete=$1),current_date,current_date,$2,(SELECT last_value FROM edw_pqt_contrato_seq),$3) returning id_paquete_contrato), pago as(Insert into edw_metodo_pago (descripcion_metodo_pago, tipo, numero_cuenta, email, edw_cliente_id_cliente, edw_cliente_edw_asesor_viaje_id_asesor, edw_banco_id) VALUES ("a",$4,$5,$3,1,0,$6) returning id_metodo_pago) insert into edw_forma_pago (tipo, edw_pqt_contrato_id_paquete_contrato, edw_metodo_pago_id_metodo_pago, edw_metodo_pago_edw_cliente_id_cliente, edw_metodo_pago_edw_cliente_edw_asesor_viaje_id_asesor)VALUES ($4,(select id_paquete_contrato from reserva),(select id_metodo_pago from pago),1,0))returning (select re.id_paquete_contrato, pg.id_metodo_pago from reserva re, pago pg ) ',
-    [id_paquete,fecha_viaje,email, tipo_pago,numero_cuenta,id_banco],(error, results) => {
+  const { fecha_viaje, email, tipo_pago,numero_cuenta,id_banco,id_cliente } = request.body
+    pool.query('with reserva as (Insert into edw_pqt_contrato (monto_total, edw_asesor_viaje_id_asesor, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia, fecha_aprobado, fecha_emitido, fecha_viaje, numero_factura, email)VALUES ((SELECT hp.costo_base from edw_historico_precio_paquete hp where hp.edw_paquete_id_paquete =$1 and hp.fecha_fin is null),0,$1,(select edw_agencia_id_agencia from edw_paquete where id_paquete=$1),current_date,current_date,$2,(SELECT last_value FROM edw_pqt_contrato_seq),$3) returning id_paquete_contrato), pago as(Insert into edw_metodo_pago (descripcion_metodo_pago, tipo, numero_cuenta, email, edw_cliente_id_cliente, edw_cliente_edw_asesor_viaje_id_asesor, edw_banco_id) VALUES ("a",$4,$5,$3,$7,0,$6) returning id_metodo_pago) insert into edw_forma_pago (tipo, edw_pqt_contrato_id_paquete_contrato, edw_metodo_pago_id_metodo_pago, edw_metodo_pago_edw_cliente_id_cliente, edw_metodo_pago_edw_cliente_edw_asesor_viaje_id_asesor)VALUES ($4,(select id_paquete_contrato from reserva),(select id_metodo_pago from pago),$7,0))returning (select re.id_paquete_contrato, pg.id_metodo_pago from reserva re, pago pg ) ',
+    [id_paquete,fecha_viaje,email, tipo_pago,numero_cuenta,id_banco,id_cliente],(error, results) => {
       if (error) {
           throw error
       }

@@ -462,10 +462,10 @@ const getAtracciones= (request, response) => {
   }  
 //CREATE 1 paquete
 const createPaquete = (request, response) => {
-  const { nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion,  id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+  const { nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion,  edw_agencia_id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
   pool.query('insert into edw_paquete (nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_agencia_id_agencia) values ($1,$2,$3,$4,$5) returning  id_paquete', 
-  [nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, id_agencia], (error, results) => {
+  [nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion, edw_agencia_id_agencia], (error, results) => {
     if (error) {
       throw error
     }
@@ -476,7 +476,7 @@ const agregarCalendario = (request, response) => {
   const { id_paquete, fecha_salida, descripcion, id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
   pool.query('insert into edw_calendario_anual (fechas_salida, descripcion, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) VALUES ($1,$2,$3,$4)', 
-  [fecha_salida, id_paquete, descripcion, id_agencia ], (error, results) => {
+  [fecha_salida, descripcion,id_paquete, id_agencia ], (error, results) => {
     if (error) {
       throw error
     }

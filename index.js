@@ -92,6 +92,22 @@ app.get('/paquetesCompra',db.getPaquetesCliente)
 app.post('/pago/:id',db.pago)
 app.post('/recibo:id',db.recibo)
 
+//Rally
+app.get('/rallies',db.getRallies)
+app.get('/rallies/:id',db.getRalliesAgencia)
+app.post('/newRally/:id',db.createRally)
+app.post('/newRallyCiudad/:id',db.addRallyCiudad)
+app.delete('/deleteCiudadRally/:id',db.deleteRallyCiudad)
+app.get('/atraccionesRally/:id',db,db.GetAtraccionesRally)
+app.post('/newAtraccionRally/:id',db.addRallyAtraccion)
+app.delete('/deleteAtraccionRally/:id',db.deleteRallyAtraccion)
+app.post('/newPremio/:id',db.addPremioRally)
+app.get('/premiosRally/:id',db.getPremiosRally)
+app.delete('/deletePremio/:id',db.deletePremioRally)
+app.put('/updatePremio/:id',db.updatePremioRally)
+
+
+
 
 
 app.listen(port, () => {

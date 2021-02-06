@@ -40,9 +40,9 @@ const pool = new Pool({
     }
   //CREATE 1 Proveedor 
   const createProveedor = (request, response) => {
-      const { numero_documento, nombre_proveedor, tipo_documento, telefono, tipo} = request.body
+      const { numero_documento_1, nombre_proveedor, tipo_documento ,telefono_proveedor ,tipo_proveedor} = request.body
     
-      pool.query('INSERT INTO edw_proveedores (numero_documento_1, nombre_proveedor ,tipo_documento ,telefono_proveedor ,tipo_proveedor) VALUES ($1, $2,$3,$4,$5)', [numero_documento, nombre_proveedor, tipo_documento, telefono, tipo], (error, results) => {
+      pool.query('INSERT INTO edw_proveedores (numero_documento_1, nombre_proveedor ,tipo_documento ,telefono_proveedor ,tipo_proveedor) VALUES ($1, $2,$3,$4,$5)', [numero_documento_1, nombre_proveedor,tipo_documento ,telefono_proveedor ,tipo_proveedor], (error, results) => {
         if (error) {
           throw error
         }
@@ -52,10 +52,10 @@ const pool = new Pool({
   //UPDATE cambia 1 proveedor por ID
   const updateProveedor = (request, response) => {
     const id = parseInt(request.params.id);
-    const { numero_documento, nombre_proveedor, tipo_documento, telefono, tipo } = request.body
+    const {numero_documento_1, nombre_proveedor, tipo_documento ,telefono_proveedor ,tipo_proveedor} = request.body
   
-    pool.query('UPDATE edw_proveedores SET numero_documento_1 = $1, nombre_proveedor = $2,tipo_documento = $3,telefono =$4 ,tipo=$5 WHERE numero_documento_1 = $6',
-      [numero_documento, nombre_proveedor, tipo_documento, telefono, tipo, id],
+    pool.query('UPDATE edw_proveedores SET numero_documento_1 = $1, nombre_proveedor = $2,tipo_documento = $3,telefono_proveedor =$4 ,tipo_proveedor=$5 WHERE numero_documento_1 = $6',
+      [numero_documento_1, nombre_proveedor, tipo_documento ,telefono_proveedor ,tipo_proveedor, id],
       (error, results) => {
         if (error) {
           throw error
@@ -67,9 +67,9 @@ const pool = new Pool({
   //Asocia 1 proveedor con 1 agencia
   const asociarseProveedor = (request,response)=> {
     const id = parseInt(request.params.id);
-    const {id_proveedor}= request.body
+    const {numero_documento_1}= request.body
     pool.query('INSERT INTO edw_proveedor_agencia (edw_agencia_id_agencia, edw_proveedores_numero_documento_1, fecha_asociacion) VALUES ($1,$2,current_date)',
-    [id, id_proveedor],
+    [id, numero_documento_1],
     (error,results)=>{
       if (error){
         throw error
@@ -126,7 +126,7 @@ const pool = new Pool({
   const getAgenciaId = (request, response) => {
     const id = parseInt(request.params.id)
 
-    pool.query('select * from edw_agencia where edw_agencia_id_agencia = $1', [id], (error, results) => {
+    pool.query('select * from edw_agencia where edw_agencia.id_agencia = $1', [id], (error, results) => {
       if (error) {
         throw error
       }
@@ -174,8 +174,8 @@ const pool = new Pool({
     const { nombre_agencia, tipo_de_operacion, alcance, descripcion, pagina_web } = request.body
     
     pool.query(
-      'UPDATE edw_agencia set nombre_agencia=$1, tipo_de_operacion=$2,alcance=$3,descripcion =$4,pagina_web=$5',
-      [nombre_agencia, tipo_de_operacion, alcance, descripcion, pagina_web],
+      'UPDATE edw_agencia set nombre_agencia=$1, tipo_de_operacion=$2,alcance=$3,descripcion =$4,pagina_web=$5 WHERE edw_agencia.id_agencia = $6',
+      [nombre_agencia, tipo_de_operacion, alcance, descripcion, pagina_web,id],
       (error, results) => {
         if (error) {
           throw error
@@ -428,11 +428,11 @@ const updatePaquete = (request, response) => {
 //UPDATE PRECIO
   const updatePrePaquete = (request, response) => {
     const id_paquete = parseInt(request.params.id)
-    const { Precio } = request.body
+    const { precio } = request.body
     
     pool.query(
       'with first_insert as (UPDATE edw_historico_precio_paquete set fecha_fin=current_date  where edw_paquete_id_paquete = $1 and fecha_fin is null) insert into edw_historico_precio_paquete(fecha_inicio, costo_base, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) values (current_date,$2,$1,(select edw_agencia_id_agencia from edw_paquete where id_paquete=$1))',
-      [id_paquete,Precio],
+      [id_paquete,precio],
       (error, results) => {
         if (error) {
           throw error
@@ -443,23 +443,24 @@ const updatePaquete = (request, response) => {
     }
 //GET todos las ciudades
 const getCiudades= (request, response) => {
-pool.query('select * from edw_ciudad', (error, results) => {
-if (error) {
+  pool.query('select * from edw_ciudad', (error, results) => {
+  if (error) {
     throw error
-}
-response.status(200).json(results.rows)
-})
+  }
+  response.status(200).json(results.rows)
+  })  
 }   
 //GET todos las atracciones de las ciudades del paquete 
 const getAtracciones= (request, response) => {
   const id_paquete = parseInt(request.params.id)
-  pool.query('select id_atraccion, nombre_atraccion from edw_atraccion inner join edw_itinerario ei on edw_atraccion.edw_ciudad_id_ciudad = ei.edw_ciudad_id_ciudad where ei.edw_paquete_id_paquete = $1',[id_paquete], (error, results) => {
+  console.log(id_paquete);
+  pool.query('select id_atraccion, nombre_atraccion, descripcion_atraccion from edw_atraccion inner join edw_itinerario ei on edw_atraccion.edw_ciudad_id_ciudad = ei.edw_ciudad_id_ciudad where ei.edw_paquete_id_paquete = $1',[id_paquete], (error, results) => {
   if (error) {
       throw error
   }
   response.status(200).json(results.rows)
   })
-  }  
+}  
 //CREATE 1 paquete
 const createPaquete = (request, response) => {
   const { nombre_paquete, duracion_paquete_dias, cantidad_personas, descripcion,  edw_agencia_id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
@@ -476,7 +477,7 @@ const agregarCalendario = (request, response) => {
   const { id_paquete, fecha_salida, descripcion, id_agencia  } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
   pool.query('insert into edw_calendario_anual (fechas_salida, descripcion, edw_paquete_id_paquete, edw_paquete_edw_agencia_id_agencia) VALUES ($1,$2,$3,$4)', 
-  [fecha_salida, descripcion,id_paquete, id_agencia ], (error, results) => {
+  [fecha_salida, id_paquete, descripcion, id_agencia ], (error, results) => {
     if (error) {
       throw error
     }
@@ -505,9 +506,9 @@ const elimCalendarioPaquete = (request, response) => {
   })
   }
 const agregarItinerarioPaquete = (request, response) => {
-  const { orden, id_paquete, id_ciudad,id_agencia,tiempo_estadia } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+  const { orden, edw_paquete_id_paquete, edw_ciudad_id_ciudad,edw_paquete_edw_agencia_id_agencia,tiempo_estadia } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
     pool.query('insert into edw_itinerario (edw_paquete_id_paquete, edw_ciudad_id_ciudad, orden, tiempo_estadia, edw_paquete_edw_agencia_id_agencia, edw_ciudad_edw_pais_id_pais)VALUES ($1,$2,$3,$4,$5,(select edw_pais_id_pais from edw_ciudad where id_ciudad=$2))', 
-    [id_paquete,id_ciudad,orden,tiempo_estadia,id_agencia], (error, results) => {
+    [edw_paquete_id_paquete,edw_ciudad_id_ciudad,orden,tiempo_estadia,edw_paquete_edw_agencia_id_agencia], (error, results) => {
       if (error) {
         throw error
       }
@@ -515,10 +516,10 @@ const agregarItinerarioPaquete = (request, response) => {
     })
     }
 const editarItinerarioPaquete = (request, response) => {
-  const { orden, tiempo_estadia, id_paquete, id_ciudad } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
+  const { orden, edw_paquete_id_paquete, edw_ciudad_id_ciudad,tiempo_estadia} = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
   pool.query('update edw_itinerario set orden=$1, tiempo_estadia=$2 where edw_paquete_id_paquete=$3 and edw_ciudad_id_ciudad=$4', 
-  [orden, tiempo_estadia, id_paquete,id_ciudad], (error, results) => {
+  [orden, tiempo_estadia, edw_paquete_id_paquete,edw_ciudad_id_ciudad], (error, results) => {
     if (error) {
       throw error
     }
@@ -545,7 +546,7 @@ const agregarAtraccionPaquete = (request, response) => {
       }
       response.status(201).send(results.rows)
     })
-    }
+}
 const editarAtraccionPaquete = (request, response) => {
   const { orden, id_atraccion, id_paquete } = request.body //Ciudad y pais se seleccionan de una droplist, luego lo vemos
 
@@ -588,8 +589,8 @@ const getPaquetesCliente = (request, response) => {
   if (error) {
       throw error
   }
-response.status(200).json(results.rows)
-})
+  response.status(200).json(results.rows)
+  })
 }
 const pago = (request,response)=>{
   const id_paquete = parseInt(request.params.id)

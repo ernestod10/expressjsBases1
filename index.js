@@ -71,6 +71,9 @@ app.post('/newLugar',db.createLugar)
 app.put('/updateLugar/:id', db.updateLugar)
 app.delete('/deleteLugar/:id',db.elimLugar)
 
+//ORG EVENTO
+app.post('/insOrg',db.insOrga)
+
 
 app.listen(port, () => {
     console.log(`App running on localhost:${port}.`)

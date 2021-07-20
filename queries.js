@@ -388,7 +388,7 @@ const elimMoneda = (request, response) => {
     const insOrga = (request, response) => {
       const {id} = request.body
       
-      pool.query('insert into ec_evento_organizador (ec_organizacion_id_organiacion, ec_evento_id_evento) VALUES ($1, (select last_value from ec_evento_id_evento_seq ))', [id], (error, results) => {
+      pool.query('insert into ec_evento_organizador (ec_organizacion_id_organizacion, ec_evento_id_evento) VALUES ($1, (select last_value from ec_evento_id_evento_seq ))', [id], (error, results) => {
         if (error) {
           throw error
         }

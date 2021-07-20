@@ -73,6 +73,7 @@ app.delete('/deleteLugar/:id',db.elimLugar)
 
 //ORG EVENTO
 app.post('/insOrg',db.insOrga)
+app.post('/insObra',db.insObraMoneda)
 
 
 app.listen(port, () => {

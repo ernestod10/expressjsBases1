@@ -395,8 +395,17 @@ const elimMoneda = (request, response) => {
         response.status(200).send(results.rows)
       })
       }
-  
-
+  //Insertar obrasy monedas
+  const insObraMoneda = (request, response) => {
+    const {ask,nur, duracion} = request.body
+    
+    pool.query('insert into ec_subasta_objeto (bid, ask, precio_final, vendido, timeinicio, ec_catalogo_obra_nur, ec_catalogo_monedas_nur, duracionmin, razonnoventa) values (1, $2,null,false,null,(select nur from ec_catalogo_obra where nur= $3),(select nur from ec_catalogo_monedas where nur=$3),4$,null)', [ask,nur, duracion], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).send(results.rows)
+    })
+    }
 
 
 
@@ -437,8 +446,8 @@ module.exports={
   updateLugar,
   elimLugar,
   //evento insert org
-  insOrga
-
+  insOrga,
+  insObraMoneda
 
 
 }
